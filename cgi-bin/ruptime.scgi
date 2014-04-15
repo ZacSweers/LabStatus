@@ -1,0 +1,57 @@
+#!/usr/local/bin/python
+import json
+import shlex
+import subprocess
+
+__author__ = 'Henri Sweers'
+
+ruptime_cmd = "ruptime -a"
+hosts_file = "hosts.txt"
+
+
+# Load hosts file (we don't want all the condor/TA/prof machines)
+# TODO: Figure out how to get a list of the headless machines
+def load_hosts():
+    with open(hosts_file) as f:
+        output = f.readlines()
+    return [x.strip() for x in output]
+
+
+# Get ruptime data from the shell, split into list of lines, each line a list of fields
+def load_ruptime():
+    args = shlex.split(ruptime_cmd)
+    output = subprocess.Popen(args, stdout=subprocess.PIPE).communicate()[
+        0].strip().split('\n')
+    return [x.split() for x in output]
+
+
+def main():
+    ruptime = load_ruptime()
+    hosts = load_hosts()
+    machines = []
+
+    for r in ruptime:
+        data = {
+            "name": r[0]
+        }
+
+        if data["name"] not in hosts:
+            continue
+
+        if r[1] == "up":
+            data["up"] = True
+            data["uptime"] = r[2].replace(",", "")
+            data["users"] = int(r[3])
+            data["load"] = float(r[6].replace(",", ""))
+        else:
+            data["up"] = False
+
+        machines.append(data)
+
+    j = json.dumps(machines)
+    print j
+
+
+if __name__ == "__main__":
+    print "Content-type: application/json\n"
+    main()

@@ -1,0 +1,50 @@
+#!/usr/local/bin/python
+import json
+import shlex
+import subprocess
+
+__author__ = 'Henri Sweers'
+
+rwho_cmd = "rwho -a"
+basement1_cmd = "cshosts kol64"
+basement2_cmd = "cshosts nethack64"
+
+
+def load_rwho():
+    args = shlex.split(rwho_cmd)
+    output = subprocess.Popen(args, stdout=subprocess.PIPE).communicate()[
+        0].strip().split('\n')
+    return [x.split() for x in output]
+
+
+def load_lab(cmd):
+    args = shlex.split(cmd)
+    output = subprocess.Popen(args, stdout=subprocess.PIPE).communicate()[
+        0].strip().split('\n')
+    return [{"name": x, "occupied": False} for x in output]
+
+
+def main():
+    lab = load_lab(basement1_cmd) + load_lab(basement2_cmd)
+    lab.sort()
+
+    rwho = load_rwho()
+
+    occupied_machines = []
+
+    for r in rwho:
+        machine_name = r[1][0:-3]
+        if "::0" in r[1]:
+            occupied_machines.append(machine_name)
+
+    for machine in lab:
+        if machine["name"] in occupied_machines:
+            machine["occupied"] = True
+
+    j = json.dumps(lab)
+    print j
+
+
+if __name__ == "__main__":
+    print "Content-type: application/json\n"
+    main()
