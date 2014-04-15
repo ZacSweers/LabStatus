@@ -1,7 +1,7 @@
 LabStatus
 =========
 
-A very minimal REST API for the UTCS labs using cgi scripts, used in the UTCS mobile apps.
+A very minimal JSON API for the UTCS labs using cgi scripts, used in the UTCS mobile apps.
 
 Special thanks to [Craig Yeh](https://www.github.com/yeh) for his early work in parsing lab map and helping me out with getting cgi-bin to work.
 
