@@ -10,14 +10,13 @@ hosts_file = "hosts.txt"
 
 
 # Load hosts file (we don't want all the condor/TA/prof machines)
-# TODO: Figure out how to get a list of the headless machines
 def load_hosts():
     with open(hosts_file) as f:
         output = f.readlines()
     return [x.strip() for x in output]
 
 
-# Get ruptime data from the shell, split into list of lines, each line a list of fields
+# Get ruptime data, split into list of lines, each line is a list of fields
 def load_ruptime():
     args = shlex.split(ruptime_cmd)
     output = subprocess.Popen(args, stdout=subprocess.PIPE).communicate()[
